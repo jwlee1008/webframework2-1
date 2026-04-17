@@ -106,6 +106,30 @@ public class ProductRepository {
     }
 
     /**
+     * 상품명 키워드 검색 (LIKE 부분 일치)
+     * JPQL의 LIKE 연산자로 키워드가 포함된 상품을 조회합니다.
+     */
+    public List<Product> findByNameContaining(String keyword) {
+        return entityManager.createQuery(
+                        "SELECT p FROM Product p LEFT JOIN FETCH p.category WHERE p.name LIKE :keyword ORDER BY p.id ASC",
+                        Product.class)
+                .setParameter("keyword", "%" + keyword + "%")
+                .getResultList();
+    }
+
+    /**
+     * 카테고리 ID로 상품 목록 조회
+     * JPQL 경로 표현식 p.category.id 로 연관 엔티티 필드에 접근합니다.
+     */
+    public List<Product> findByCategoryId(Long categoryId) {
+        return entityManager.createQuery(
+                        "SELECT p FROM Product p LEFT JOIN FETCH p.category WHERE p.category.id = :cid ORDER BY p.id ASC",
+                        Product.class)
+                .setParameter("cid", categoryId)
+                .getResultList();
+    }
+
+    /**
      * 상품 수정 (기존 데이터 업데이트)
      *
      * EntityManager.merge():
